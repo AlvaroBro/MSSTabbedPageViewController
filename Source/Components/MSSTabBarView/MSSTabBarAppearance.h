@@ -27,6 +27,10 @@ extern NSString *const _Nonnull MSSTabIndicatorImage;
  The tint color to use for the tab indicator image.
  */
 extern NSString *const _Nonnull MSSTabIndicatorImageTintColor;
+/**
+  Whether the indicator's width is equal to the cell size (false) or the title text size (true)
+ */
+extern NSString *const _Nonnull MSSTabIndicatorAdjustsWidth;
 
 /**
  Whether the crossfading alpha effect is enabled for tab transitions.

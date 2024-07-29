@@ -74,6 +74,10 @@
     return self.imageImageView.image;
 }
 
+- (CGFloat)textTitleLabelWidth {
+    return self.textTitleLabel.frame.size.width;
+}
+
 #pragma mark - Private
 
 - (void)setTextColor:(UIColor *)textColor {

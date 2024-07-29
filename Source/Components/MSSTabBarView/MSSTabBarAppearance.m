@@ -15,5 +15,6 @@ NSString *  const MSSTabTitleAlpha = @"tabTitleAlpha";
 NSString *  const MSSTabIndicatorLineHeight = @"indicatorLineHeight";
 NSString *  const MSSTabIndicatorImage = @"indicatorImage";
 NSString *  const MSSTabIndicatorImageTintColor = @"indicatorImageTintColor";
+NSString *  const MSSTabIndicatorAdjustsWidth = @"indicatorAdjustsWidth";
 
 NSString *  const MSSTabTransitionAlphaEffectEnabled = @"alphaEffectEnabled";

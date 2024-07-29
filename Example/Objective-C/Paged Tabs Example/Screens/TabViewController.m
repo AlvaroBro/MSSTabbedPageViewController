@@ -17,8 +17,9 @@
     if (self = [super initWithCoder:aDecoder]) {
         _style = [TabControllerStyle styleWithName:@"Default"
                                           tabStyle:MSSTabStyleText
-                                       sizingStyle:MSSTabSizingStyleSizeToFit
-                                      numberOfTabs:6];
+                                       sizingStyle:MSSTabSizingStyleDistributed
+                                   transitionStyle:MSSTabTransitionStyleProgressive
+                                      numberOfTabs:3];
     }
     return self;
 }
@@ -44,10 +45,13 @@
     self.tabBarView.sizingStyle = self.style.sizingStyle;
     
     self.tabBarView.tabAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0f weight:UIFontWeightThin],
-                                      NSForegroundColorAttributeName : [UIColor blackColor],
-                                      MSSTabTitleAlpha: @(0.1f)};
+                                      NSForegroundColorAttributeName : self.view.tintColor,
+                                      MSSTabTitleAlpha: @(0.3f)};
     self.tabBarView.selectedTabAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0f weight:UIFontWeightMedium],
                                               NSForegroundColorAttributeName : self.view.tintColor};
+    self.tabBarView.indicatorAttributes = @{MSSTabIndicatorLineHeight : @(2),
+                                            MSSTabIndicatorAdjustsWidth : @(true),
+                                            NSForegroundColorAttributeName : self.view.tintColor};
 }
 
 #pragma mark - Interaction

@@ -28,4 +28,9 @@
  */
 @property (nonatomic, copy, nullable) NSString *title;
 
+/**
+ Getter for the width of the title text
+ */
+@property (nonatomic, readonly) CGFloat textTitleLabelWidth;
+
 @end

@@ -486,17 +486,20 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     _selectedIndexPath = indexPath;
     
     cell.selectionProgress = 1.0f;
-
+    
+    CGFloat indicatorMargin = self.indicatorAdjustsWidth ? MAX(0, cell.frame.size.width - cell.textTitleLabelWidth) : 0;
+    CGFloat indicatorWidth = self.indicatorAdjustsWidth ? cell.textTitleLabelWidth : cell.frame.size.width;
+    
     if (self.animateDataSourceTransition) {
         [UIView animateWithDuration:0.25f animations:^{
-            [self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x
-                                             andWidth:cell.frame.size.width
-                                    accountForPadding:YES];
+            [self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x + indicatorMargin / 2
+                                             andWidth:indicatorWidth
+                                    accountForPadding:!self.indicatorAdjustsWidth];
         }];
     } else {
-        [self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x
-                                         andWidth:cell.frame.size.width
-                                accountForPadding:YES];
+        [self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x + indicatorMargin / 2
+                                         andWidth:indicatorWidth
+                                accountForPadding:!self.indicatorAdjustsWidth];
     }
 }
 
@@ -544,12 +547,16 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
         return;
     }
     
+    CGFloat currentTabIndicatorMargin = self.indicatorAdjustsWidth ? MAX(0, currentTabCell.frame.size.width - currentTabCell.textTitleLabelWidth) : 0;
+    CGFloat nextTabIndicatorMargin = self.indicatorAdjustsWidth ? MAX(0, nextTabCell.frame.size.width - nextTabCell.textTitleLabelWidth) : 0;
+    
     // calculate the upper and lower x origins for cells
-    CGFloat upperXPos = MAX(nextTabCell.frame.origin.x, currentTabCell.frame.origin.x);
-    CGFloat lowerXPos = MIN(nextTabCell.frame.origin.x, currentTabCell.frame.origin.x);
+    CGFloat lowerCellXPos = MIN(nextTabCell.frame.origin.x, currentTabCell.frame.origin.x);
+    CGFloat upperXPos = MAX(nextTabCell.frame.origin.x + nextTabIndicatorMargin / 2, currentTabCell.frame.origin.x + currentTabIndicatorMargin / 2);
+    CGFloat lowerXPos = MIN(nextTabCell.frame.origin.x + nextTabIndicatorMargin / 2, currentTabCell.frame.origin.x + currentTabIndicatorMargin / 2);
     
     // swap cells according to which has lowest X origin
-    BOOL backwards = (nextTabCell.frame.origin.x == lowerXPos);
+    BOOL backwards = (nextTabCell.frame.origin.x == lowerCellXPos);
     if (backwards) {
         MSSTabBarCollectionViewCell *temp = nextTabCell;
         nextTabCell = currentTabCell;
@@ -562,31 +569,32 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self.indicatorTransitionStyle == MSSTabTransitionStyleProgressive) {
         
         // calculate width difference
-        CGFloat currentTabWidth = currentTabCell.frame.size.width;
-        CGFloat nextTabWidth = nextTabCell.frame.size.width;
-        CGFloat widthDiff = (nextTabWidth - currentTabWidth) * progress;
+        CGFloat currentTabIndicatorWidth = self.indicatorAdjustsWidth ? currentTabCell.textTitleLabelWidth : currentTabCell.frame.size.width;
+        CGFloat nextTabIndicatorWidth = self.indicatorAdjustsWidth ? nextTabCell.textTitleLabelWidth : nextTabCell.frame.size.width;
+        CGFloat widthDiff = (nextTabIndicatorWidth - currentTabIndicatorWidth) * progress;
         
         // calculate new frame for indicator
         newX = lowerXPos + ((upperXPos - lowerXPos) * progress);
-        newWidth = currentTabWidth + widthDiff;
+        newWidth = currentTabIndicatorWidth + widthDiff;
         
         [self updateIndicatorViewFrameWithXOrigin:newX
                                          andWidth:newWidth
-                                accountForPadding:YES];
+                                accountForPadding:!self.indicatorAdjustsWidth];
         
     } else if (self.indicatorTransitionStyle == MSSTabTransitionStyleSnap) {
         
         MSSTabBarCollectionViewCell *cell = progress > MSSTabBarViewTabTransitionSnapRatio ? nextTabCell : currentTabCell;
         
-        newX = cell.frame.origin.x;
-        newWidth = cell.frame.size.width;
+        CGFloat indicatorMargin = self.indicatorAdjustsWidth ? MAX(0, cell.frame.size.width - cell.textTitleLabelWidth) : 0;
+        newX = cell.frame.origin.x + indicatorMargin / 2;
+        newWidth = self.indicatorAdjustsWidth ? cell.textTitleLabelWidth : cell.frame.size.width;
         
         BOOL requiresUpdate = self.indicatorContainer.frame.origin.x != newX;
         if (requiresUpdate) {
             [UIView animateWithDuration:0.25f animations:^{
                 [self updateIndicatorViewFrameWithXOrigin:newX
                                                  andWidth:newWidth
-                                        accountForPadding:YES];
+                                        accountForPadding:!self.indicatorAdjustsWidth];
             }];
         }
     }
@@ -633,6 +641,15 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
         return (MSSTabBarCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     }
     return nil;
+}
+
+- (BOOL)indicatorAdjustsWidth {
+    BOOL indicatorAdjustsWidthValue = NO;
+    NSNumber *indicatorAdjustsWidth;
+    if ((indicatorAdjustsWidth = self.indicatorAttributes[MSSTabIndicatorAdjustsWidth])) {
+        indicatorAdjustsWidthValue = [indicatorAdjustsWidth boolValue];
+    }
+    return indicatorAdjustsWidthValue;
 }
 
 #pragma mark - Internal
